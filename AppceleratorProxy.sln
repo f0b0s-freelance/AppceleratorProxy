@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppceleratorProxy", "AcceleratorProxy\AppceleratorProxy.csproj", "{CDB39C89-7AA6-4484-A53F-08966F3DDDBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppceleratorProxyTests", "AppceleratorProxyTests\AppceleratorProxyTests.csproj", "{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDB39C89-7AA6-4484-A53F-08966F3DDDBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDB39C89-7AA6-4484-A53F-08966F3DDDBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDB39C89-7AA6-4484-A53F-08966F3DDDBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDB39C89-7AA6-4484-A53F-08966F3DDDBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
