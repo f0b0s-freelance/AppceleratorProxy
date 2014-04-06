@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace AppceleratorProxy
 {
-    public class AppceleratorProxy
+    public class AppceleratorProxy : IDisposable
     {
+        private bool _disposed;
         private readonly string _appKey;
         private readonly HttpClient _httpClient;
 
@@ -198,6 +199,30 @@ namespace AppceleratorProxy
                                                          };
             nameContent.Headers.ContentType = null;
             return nameContent;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _httpClient.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~AppceleratorProxy()
+        {
+            Dispose(false);
         }
     }
 }
