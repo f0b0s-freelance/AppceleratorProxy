@@ -24,7 +24,7 @@ namespace AppceleratorProxyTests
         {
             var proxy = new AppceleratorProxy.AppceleratorProxy(Key);
             Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-            var result = proxy.UploadFile("123.txt", "teextable");
+            var result = proxy.CreateFile("123.txt", "teextable");
             Debug.WriteLine(result.Result.Result.Status);
         }
 
@@ -33,7 +33,7 @@ namespace AppceleratorProxyTests
         {
             var proxy = new AppceleratorProxy.AppceleratorProxy(Key);
             Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-            var result = proxy.Delete("533ffea91316e90b6e23f81b");
+            var result = proxy.DeleteFile("533ffea91316e90b6e23f81b");
             Debug.WriteLine(result.Result.Status);
         }
 
@@ -51,7 +51,7 @@ namespace AppceleratorProxyTests
         {
             var proxy = new AppceleratorProxy.AppceleratorProxy(Key);
             Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-            var result = proxy.Update("123.txt", "teextable", "533ffe0115d8270b632408ac");
+            var result = proxy.UpdateFile("123.txt", "teextable", "533ffe0115d8270b632408ac");
             Debug.WriteLine(result.Result);
         }
 
