@@ -39,8 +39,9 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.DeleteFile("533ffe0115d8270b632408ac");
-                Debug.WriteLine(result.Result.Status);
+                var result = proxy.DeleteFile("53415768891fdf0b73256cf6");
+                Debug.WriteLine(result.Result.Result.Status);
+                Debug.WriteLine(result.IsCompleted);
             }
         }
 
@@ -61,7 +62,7 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.UpdateFile("updated.txt", "binary", "534156b315d8270b63256fe4");
+                var result = proxy.UpdateFile("123.txt", "ttt", "534156b315d8270b63256fe4");
                 Debug.WriteLine(result.Result);
             }
         }

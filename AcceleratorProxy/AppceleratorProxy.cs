@@ -121,7 +121,7 @@ namespace AppceleratorProxy
         /// </summary>
         /// <param name="fileId">ID of the file to delete.</param>
         /// <returns></returns>
-        public Task<RequestMetaInfo> DeleteFile(string fileId)
+        public Task<RequestResult> DeleteFile(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
             {
@@ -130,7 +130,7 @@ namespace AppceleratorProxy
 
             var url = string.Format("https://api.cloud.appcelerator.com/v1/files/delete.json?key={0}&file_id={1}",
                                     _appKey, fileId);
-            return ReadObject<RequestMetaInfo>(url);
+            return ReadObject<RequestResult>(url);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace AppceleratorProxy
                 var nameContent = GetNameDataContent("\"name\"", remoteName);
                 multipart.Add(nameContent);
 
-                var fileIdContent = GetNameDataContent("fileId", fileId);
+                var fileIdContent = GetNameDataContent("\"file_id\"", fileId);
                 multipart.Add(fileIdContent);
 
                 var fileContent = GetFileDataContent(path, file, "text/plain");
