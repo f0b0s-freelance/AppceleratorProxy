@@ -14,9 +14,11 @@ namespace AppceleratorProxyTests
         [Test]
         public void AuthorizeTest()
         {
-            var proxy = new AppceleratorProxy.AppceleratorProxy(Key);
-            var result = proxy.Authorize("admin", "admin");
-            Debug.WriteLine(result.Result.Result.Status);
+            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            {
+                var result = proxy.Authorize("admin", "admin");
+                Debug.WriteLine(result.Result.Result.Status);
+            }
         }
 
         [Test]
@@ -25,8 +27,9 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.CreateFile("123.txt", "teextable");
+                var result = proxy.CreateFile("123.txt", "notes");
                 Debug.WriteLine(result.Result.Result.Status);
+                Debug.WriteLine(result.Result.Result.Code);
             }
         }
 
@@ -36,7 +39,7 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.DeleteFile("533ffea91316e90b6e23f81b");
+                var result = proxy.DeleteFile("533ffe0115d8270b632408ac");
                 Debug.WriteLine(result.Result.Status);
             }
         }
@@ -47,7 +50,7 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.GetFile("533ffe0115d8270b632408ac");
+                var result = proxy.GetFile("5341566c891fdf0b73256bdc");
                 Debug.WriteLine(result.Result);
             }
         }
@@ -58,7 +61,7 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.UpdateFile("123.txt", "teextable", "533ffe0115d8270b632408ac");
+                var result = proxy.UpdateFile("updated.txt", "binary", "534156b315d8270b63256fe4");
                 Debug.WriteLine(result.Result);
             }
         }
@@ -69,8 +72,8 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.ListFiles("1", "10", "\"user_id\":\"4f0fe764d9ca72833d000002\", \"name\":\"my_file\"",
-                                             "created_at");
+                //var result = proxy.ListFiles("1", "1", "\"user_id\":\"4f0fe764d9ca72833d000002\", \"name\":\"my_file\"", "created_at");
+                var result = proxy.ListFiles("1", "10", "\"user_id\":\"4f0fe764d9ca72833d000002\", \"name\":\"my_file\"", "created_at");
                 Debug.WriteLine(result.Result);
             }
         }

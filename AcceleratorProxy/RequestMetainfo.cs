@@ -16,5 +16,8 @@ namespace AppceleratorProxy
 
         [DataMember(Name = "sesion_id")]
         public string SessionId { get; set; }
+
+        [DataMember(Name = "message")]
+        public string Message { get; set; }
     }
 }
