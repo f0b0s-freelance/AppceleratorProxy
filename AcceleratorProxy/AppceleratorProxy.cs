@@ -4,17 +4,10 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AppceleratorProxy
 {
-    public class PhotoSize
-    {
-        public string Name { get; set; }
-        public string Size { get; set; }
-    }
-
     public class AppceleratorProxy
     {
         private readonly string _appKey;
@@ -55,7 +48,56 @@ namespace AppceleratorProxy
                 return (RequestResult)ser.ReadObject(response.Content.ReadAsStreamAsync().Result);
             }
         }
-        
+
+        public async Task<FileResult> GetFile(string fileId)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/files/show.json?key={0}&file_id={1}", _appKey, fileId);
+            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
+            var serializer = new DataContractJsonSerializer(typeof(FileResult));
+            return (FileResult)serializer.ReadObject(responseTask);
+        }
+
+        public async Task<FileResult> ListFiles(string pageNumber, string perPage, string predicat, string order)
+        {
+            var url =
+                string.Format(
+                    "https://api.cloud.appcelerator.com/v1/files/query.json?key={0}&page={1}&per_page={2}&where={{{3}}}&order={4}",
+                    _appKey, pageNumber, perPage, Uri.EscapeDataString(predicat), order);
+            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
+            var serializer = new DataContractJsonSerializer(typeof(FileResult));
+            return (FileResult)serializer.ReadObject(responseTask);
+        }
+
+        public async Task<RequestMetaInfo> Delete(string fileId)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/files/delete.json?key={0}&file_id={1}", _appKey, fileId);
+            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
+            var serializer = new DataContractJsonSerializer(typeof(RequestMetaInfo));
+            return (RequestMetaInfo)serializer.ReadObject(responseTask);
+        }
+
+        public async Task<FileResult> Update(string path, string remoteName, string fileId)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/files/create.json?key={0}", _appKey);
+            var multipart = new MultipartFormDataContent();
+
+            using (var file = File.Open(path, FileMode.Open))
+            {
+                var nameContent = GetNameDataContent(remoteName);
+                multipart.Add(nameContent);
+
+                var fileIdContent = GetNameDataContent(fileId, "fileId");
+                multipart.Add(fileIdContent);
+
+                var fileContent = GetFileDataContent(path, file, "text/plain");
+                multipart.Add(fileContent);
+
+                var response = await _httpClient.PostAsync(url, multipart).ConfigureAwait(false);
+                var ser = new DataContractJsonSerializer(typeof(FileResult));
+                return (FileResult)ser.ReadObject(response.Content.ReadAsStreamAsync().Result);
+            }
+        }
+
         public async Task<RequestResult> UpdaloadPhoto(string path, string remoteName, IEnumerable<PhotoSize> sizes)
         {
             var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/create.json?key={0}", _appKey);
@@ -72,14 +114,6 @@ namespace AppceleratorProxy
                     multipart.Add(sizeContent);
                 }
 
-//                var sizeContent = new StringContent("100x100");
-//                sizeContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-//                                                             {
-//                                                                 Name = "\"photo_sizes[android]\""
-//                                                             };
-//                sizeContent.Headers.ContentType = null;
-//                multipart.Add(sizeContent);
-
                 var fileContent = GetFileDataContent(path, file, "image/jpeg");
                 multipart.Add(fileContent);
 
@@ -87,6 +121,22 @@ namespace AppceleratorProxy
                 var ser = new DataContractJsonSerializer(typeof(RequestResult));
                 return (RequestResult)ser.ReadObject(response.Content.ReadAsStreamAsync().Result);
             }
+        }
+
+        public async Task<RequestMetaInfo> DeletePhoto(string photoId)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/delete.json?key={0}&photo_id={1}", _appKey, photoId);
+            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
+            var serializer = new DataContractJsonSerializer(typeof(RequestMetaInfo));
+            return (RequestMetaInfo)serializer.ReadObject(responseTask);
+        }
+
+        public async Task<PhotoResult> GetPhoto(string photoId)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/show.json?key={0}&photo_id={1}", _appKey, photoId);
+            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
+            var serializer = new DataContractJsonSerializer(typeof(PhotoResult));
+            return (PhotoResult)serializer.ReadObject(responseTask);
         }
 
         private StringContent GetSizeDataContent(PhotoSize photoSize)
@@ -115,6 +165,45 @@ namespace AppceleratorProxy
                                                          };
             nameContent.Headers.ContentType = null;
             return nameContent;
+        }
+
+        public async Task<PhotoResult> UpdatePhoto(string photoId, string path, string remoteName, IEnumerable<PhotoSize> sizes)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/update.json?key={0}", _appKey);
+            var multipart = new MultipartFormDataContent();
+
+            using (var file = File.Open(path, FileMode.Open))
+            {
+                var photoIdContent = GetNameDataContent(photoId, "\"photo_id\"");
+                multipart.Add(photoIdContent);
+
+                var nameContent = GetNameDataContent(remoteName);
+                multipart.Add(nameContent);
+
+                foreach (var size in sizes)
+                {
+                    var sizeContent = GetSizeDataContent(size);
+                    multipart.Add(sizeContent);
+                }
+
+                var fileContent = GetFileDataContent(path, file, "image/jpeg");
+                multipart.Add(fileContent);
+
+                var response = await _httpClient.PostAsync(url, multipart).ConfigureAwait(false);
+                var ser = new DataContractJsonSerializer(typeof(PhotoResult));
+                return (PhotoResult)ser.ReadObject(response.Content.ReadAsStreamAsync().Result);
+            }
+        }
+
+        public async Task<PhotoResult> ListPhotos(string pageNumber, string perPage, string predicat, string order)
+        {
+            var url =
+                string.Format(
+                    "https://api.cloud.appcelerator.com/v1/photos/query.json?key={0}&page={1}&per_page={2}&where={{{3}}}&order={4}",
+                    _appKey, pageNumber, perPage, Uri.EscapeDataString(predicat), order);
+            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
+            var serializer = new DataContractJsonSerializer(typeof(PhotoResult));
+            return (PhotoResult)serializer.ReadObject(responseTask);
         }
     }
 }
