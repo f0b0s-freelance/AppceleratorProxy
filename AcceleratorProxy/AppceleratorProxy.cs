@@ -144,7 +144,7 @@ namespace AppceleratorProxy
         {
             if (!File.Exists(path))
             {
-                throw new ArgumentException(string.Format("File '{0}' doesn't exists", path));
+                throw new ArgumentException(string.Format("File '{0}' doesn't exists", path), "path");
             }
 
             if (string.IsNullOrEmpty(remoteName))
@@ -154,81 +154,125 @@ namespace AppceleratorProxy
 
             if (string.IsNullOrEmpty(fileId))
             {
-                throw new ArgumentException("File id can't be null or empty");
+                throw new ArgumentException("File id can't be null or empty", "fileId");
             }
 
             return UpdateFileInner(path, remoteName, fileId);
         }
 
-        public Task<RequestResult> UpdaloadPhoto(string path, string remoteName, IEnumerable<PhotoSize> sizes)
+        /// <summary>
+        /// Create a photo.
+        /// </summary>
+        /// <param name="path">Path lo local file</param>
+        /// <param name="remoteName">Photo name on the site</param>
+        /// <param name="sizes">User-defined photo sizes. Pass null if you want default sizes</param>
+        /// <returns></returns>
+        public Task<PhotoResult> CreatePhoto(string path, string remoteName, IEnumerable<PhotoSize> sizes)
         {
-            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/create.json?key={0}", _appKey);
-            var multipart = new MultipartFormDataContent();
-
-            using (var file = File.Open(path, FileMode.Open))
+            if (!File.Exists(path))
             {
-                var nameContent = GetNameDataContent("\"name\"", remoteName);
-                multipart.Add(nameContent);
-
-                foreach (var size in sizes)
-                {
-                    var sizeContent = GetSizeDataContent(size);
-                    multipart.Add(sizeContent);
-                }
-
-                var fileContent = GetFileDataContent(path, file, "image/jpeg");
-                multipart.Add(fileContent);
-
-                return ReadPost<RequestResult>(url, multipart);
+                throw new ArgumentException(string.Format("File '{0}' doesn't exists", path));
             }
-        }
 
-        public Task<RequestMetaInfo> DeletePhoto(string photoId)
+            if (string.IsNullOrEmpty(remoteName))
+            {
+                throw new ArgumentException("Remote name can't be null or empty", "remoteName");
+            }
+
+            return CreatePhotoInner(path, remoteName, sizes);
+        }
+        
+        /// <summary>
+        /// Deletes a photo to which you have update access.
+        /// </summary>
+        /// <param name="photoId">ID of the photo to delete.</param>
+        /// <returns></returns>
+        public Task<RequestResult> DeletePhoto(string photoId)
         {
-            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/delete.json?key={0}&photo_id={1}", _appKey, photoId);
-            return ReadObject<RequestMetaInfo>(url);
+            if (photoId == null)
+            {
+                throw new ArgumentException("Photo id can't be null", "photoId");
+            }
+
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/delete.json?key={0}&photo_id={1}",
+                                    _appKey, photoId);
+            return ReadObject<RequestResult>(url);
         }
 
+        /// <summary>
+        /// Returns the information for the identified photo.
+        /// </summary>
+        /// <param name="photoId">ID of the photo to show.</param>
+        /// <returns></returns>
         public Task<PhotoResult> GetPhoto(string photoId)
         {
-            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/show.json?key={0}&photo_id={1}", _appKey, photoId);
-            return ReadObject<PhotoResult>(url);
-        }
-
-        public Task<PhotoResult> UpdatePhoto(string photoId, string path, string remoteName, IEnumerable<PhotoSize> sizes)
-        {
-            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/update.json?key={0}", _appKey);
-            var multipart = new MultipartFormDataContent();
-
-            using (var file = File.Open(path, FileMode.Open))
+            if (photoId == null)
             {
-                var photoIdContent = GetNameDataContent("\"photo_id\"", photoId);
-                multipart.Add(photoIdContent);
-
-                var nameContent = GetNameDataContent("\"name\"", remoteName);
-                multipart.Add(nameContent);
-
-                foreach (var size in sizes)
-                {
-                    var sizeContent = GetSizeDataContent(size);
-                    multipart.Add(sizeContent);
-                }
-
-                var fileContent = GetFileDataContent(path, file, "image/jpeg");
-                multipart.Add(fileContent);
-
-                return ReadPost<PhotoResult>(url, multipart);
+                throw new ArgumentException("Photo id can't be null", "photoId");
             }
+
+            var settings = new DataContractJsonSerializerSettings {UseSimpleDictionaryFormat = true};
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/show.json?key={0}&photo_id={1}", _appKey, photoId);
+            return ReadObject<PhotoResult>(url, settings);
         }
 
+        /// <summary>
+        /// Updates the photo.
+        /// </summary>
+        /// <param name="photoId">ID of the photo to update.</param>
+        /// <param name="path">Path to the new photo to associate with this object.</param>
+        /// <param name="photoTitle">Photo title.</param>
+        /// <param name="sizes">User-defined photo sizes. Pass null if you want default sizes</param>
+        /// <returns></returns>
+        public Task<PhotoResult> UpdatePhoto(string photoId, string path, string photoTitle, IEnumerable<PhotoSize> sizes)
+        {
+            if (!File.Exists(path))
+            {
+                throw new ArgumentException(string.Format("File '{0}' doesn't exists", path), "path");
+            }
+
+            if (string.IsNullOrEmpty(photoTitle))
+            {
+                throw new ArgumentException("Photo title can't be null or empty", "photoTitle");
+            }
+
+            if (string.IsNullOrEmpty(photoId))
+            {
+                throw new ArgumentException("Photo id can't be null or empty", "photoId");
+            }
+
+            return UpdatePhotoInner(photoId, path, photoTitle, sizes);
+        }
+
+        /// <summary>
+        /// Perform custom query of photos with sorting and paginating.
+        /// </summary>
+        /// <param name="pageNumber">Request page number</param>
+        /// <param name="perPage">Number of results per page</param>
+        /// <param name="predicat">Constraint values for fields. Pass null if shouldn't be used</param>
+        /// <param name="order">Sort results by one or more fields. Pass null if don't want any sorting</param>
+        /// <returns></returns>
         public Task<PhotoResult> ListPhotos(string pageNumber, string perPage, string predicat, string order)
         {
+            if (string.IsNullOrEmpty(pageNumber))
+            {
+                throw new ArgumentException("Page number can't be null or empty", "pageNumber");
+            }
+
+            if (string.IsNullOrEmpty(perPage))
+            {
+                throw new ArgumentException("PerPage can't be null or empty", "perPage");
+            }
+
+            var settings = new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true };
+            var escapedWhere = predicat == null ? null : Uri.EscapeDataString(predicat);
             var url =
                 string.Format(
                     "https://api.cloud.appcelerator.com/v1/photos/query.json?key={0}&page={1}&per_page={2}&where={{{3}}}&order={4}",
-                    _appKey, pageNumber, perPage, Uri.EscapeDataString(predicat), order);
+                    _appKey, pageNumber, perPage, escapedWhere, order);
 
-            return ReadObject<PhotoResult>(url);
+
+            return ReadObject<PhotoResult>(url, settings);
         }
 
         private async Task<FileResult> CreateFileInner(string path, string remoteName)
@@ -268,22 +312,84 @@ namespace AppceleratorProxy
             }
         }
 
-        private async Task<T> ReadObject<T>(string url)
+        private async Task<PhotoResult> CreatePhotoInner(string path, string remoteName, IEnumerable<PhotoSize> sizes)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/create.json?key={0}", _appKey);
+            var multipart = new MultipartFormDataContent();
+
+            using (var file = File.Open(path, FileMode.Open))
+            {
+                var nameContent = GetNameDataContent("\"title\"", remoteName);
+                multipart.Add(nameContent);
+
+                if (sizes != null)
+                {
+                    foreach (var size in sizes)
+                    {
+                        var sizeContent = GetSizeDataContent(size);
+                        multipart.Add(sizeContent);
+                    }
+                }
+
+                var fileContent = GetFileDataContent(path, file, "image/jpeg");
+                multipart.Add(fileContent);
+                var settings = new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true };
+
+                return await ReadPost<PhotoResult>(url, multipart, settings).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<PhotoResult> UpdatePhotoInner(string photoId, string path, string photoTitle, IEnumerable<PhotoSize> sizes)
+        {
+            var url = string.Format("https://api.cloud.appcelerator.com/v1/photos/update.json?key={0}", _appKey);
+            var multipart = new MultipartFormDataContent();
+
+            using (var file = File.Open(path, FileMode.Open))
+            {
+                var photoIdContent = GetNameDataContent("\"photo_id\"", photoId);
+                multipart.Add(photoIdContent);
+
+                var nameContent = GetNameDataContent("\"title\"", photoTitle);
+                multipart.Add(nameContent);
+
+                if (sizes != null)
+                {
+                    foreach (var size in sizes)
+                    {
+                        var sizeContent = GetSizeDataContent(size);
+                        multipart.Add(sizeContent);
+                    }
+                }
+
+                var fileContent = GetFileDataContent(path, file, "image/jpeg");
+                multipart.Add(fileContent);
+                var settings = new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true };
+
+                return await ReadPost<PhotoResult>(url, multipart, settings).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<T> ReadObject<T>(string url, DataContractJsonSerializerSettings settings = null)
         {
             var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof(T));
+            var serializer = settings == null
+                                 ? new DataContractJsonSerializer(typeof (T))
+                                 : new DataContractJsonSerializer(typeof (T), settings);
             return (T)serializer.ReadObject(responseTask);
         }
 
-        private async Task<T> ReadPost<T>(string url, HttpContent content)
+        private async Task<T> ReadPost<T>(string url, HttpContent content, DataContractJsonSerializerSettings settings = null)
         {
             var responseMessage = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof(T));
+            var serializer = settings == null
+                     ? new DataContractJsonSerializer(typeof(T))
+                     : new DataContractJsonSerializer(typeof(T), settings);
+
             return (T)serializer.ReadObject(responseStream);
         }
 
-        private StringContent GetSizeDataContent(PhotoSize photoSize)
+        private static StringContent GetSizeDataContent(PhotoSize photoSize)
         {
             return GetNameDataContent(string.Format("photo_sizes[{0}]", photoSize.Name), photoSize.Size);
         }

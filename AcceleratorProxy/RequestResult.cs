@@ -97,11 +97,14 @@ namespace AppceleratorProxy
         [DataMember(Name = "content_type")]
         public string ContentType { get; set; }
 
-        [DataMember(Name = "url")]
-        public string Url { get; set; }
+        [DataMember(Name = "title")]
+        public string Title { get; set; }
 
         [DataMember(Name = "user")]
         public User User { get; set; }
+
+        [DataMember(Name = "urls")]
+        public Dictionary<string, object> PhotoUrls { get; set; }
     }
     
     [DataContract]
@@ -130,5 +133,13 @@ namespace AppceleratorProxy
 
         [DataMember(Name = "admin")]
         public bool IsAdmin { get; set; }
+    }
+
+    [DataContract]
+    public class PhotoUrl
+    {
+        public string Name { get; set; }
+        
+        public string Url { get; set; }
     }
 }

@@ -100,7 +100,7 @@ namespace AppceleratorProxyTests
                                         }
                                 };
 
-                var result = proxy.UpdaloadPhoto("1.png", "Photo", sizes);
+                var result = proxy.CreatePhoto("1.jpg", "Karina", sizes);
                 Debug.WriteLine(result.Result.Result.Status);
             }
         }
@@ -112,8 +112,8 @@ namespace AppceleratorProxyTests
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
 
-                var result = proxy.DeletePhoto("533ff06815d8270b5b23dc16");
-                Debug.WriteLine(result.Result.Status);
+                var result = proxy.DeletePhoto("5341658f0f4fb50bae003c15");
+                Debug.WriteLine(result.Result.Result.Status);
             }
         }
 
@@ -123,7 +123,7 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.GetPhoto("533ff96715d8270b5b23ea87");
+                var result = proxy.GetPhoto("53416654ed8cdc0b39003bd3");
                 Debug.WriteLine(result.Result);
             }
         }
@@ -140,15 +140,11 @@ namespace AppceleratorProxyTests
                                         {
                                             Name = "WP8",
                                             Size = "100x100"
-                                        },
-                                    new PhotoSize
-                                        {
-                                            Name = "PC",
-                                            Size = "200x200"
                                         }
                                 };
 
-                var result = proxy.UpdatePhoto("533ff9171316e90b6e23f09f", "2.png", "changed", sizes);
+                //var result = proxy.UpdatePhoto("533ff9171316e90b6e23f09f", "2.png", "changed", sizes);
+                var result = proxy.UpdatePhoto("534163ceed8cdc0b2f003aab", "2.png", "ccc", sizes);
                 Debug.WriteLine(result.Result);
             }
         }
@@ -159,7 +155,9 @@ namespace AppceleratorProxyTests
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
-                var result = proxy.ListPhotos("1", "10", "\"user_id\":\"533efde215d8270b6323064d\"", "created_at");
+                var result = proxy.ListPhotos("1", "10", "\"user_id\":\"533efde215d8270b63230641\"", "created_at");
+                //var result = proxy.ListPhotos("1", "10", null, "created_at");
+                //var result = proxy.ListPhotos("2", "2", null, null);
                 Debug.WriteLine(result.Result);
             }
         }
