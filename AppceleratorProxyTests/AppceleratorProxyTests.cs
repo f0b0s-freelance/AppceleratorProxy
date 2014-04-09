@@ -34,6 +34,20 @@ namespace AppceleratorProxyTests
         }
 
         [Test]
+        public void CreateThroughStreamTest()
+        {
+            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var file = File.Open("q.txt", FileMode.Open))
+            {
+                Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
+                var result = proxy.CreateFile(file, "ha");
+                Debug.WriteLine(result.Result.Result.Status);
+                Debug.WriteLine(result.Result.Result.Code);
+            }
+        }
+
+
+        [Test]
         public void DeleteFile()
         {
             using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))

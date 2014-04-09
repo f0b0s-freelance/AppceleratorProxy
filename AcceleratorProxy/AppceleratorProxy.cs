@@ -70,6 +70,27 @@ namespace AppceleratorProxy
         }
 
         /// <summary>
+        /// Create a file
+        /// </summary>
+        /// <param name="fileStream">Stream with file content</param>
+        /// <param name="remoteName">File name on the site</param>
+        /// <returns></returns>
+        public Task<FileResult> CreateFile(Stream fileStream, string remoteName)
+        {
+            if (fileStream == null)
+            {
+                throw new ArgumentNullException("fileStream");
+            }
+
+            if (string.IsNullOrEmpty(remoteName))
+            {
+                throw new ArgumentException("Remote name can't be null or empty", "remoteName");
+            }
+
+            return CreateFileInner(fileStream, remoteName, remoteName);
+        }
+
+        /// <summary>
         /// Returns information associated with the file.
         /// </summary>
         /// <param name="fileId">ID of the file to retrieve information for.</param>
@@ -277,19 +298,24 @@ namespace AppceleratorProxy
 
         private async Task<FileResult> CreateFileInner(string path, string remoteName)
         {
+            using (var file = File.Open(path, FileMode.Open))
+            {
+                return await CreateFileInner(file, path, remoteName).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<FileResult> CreateFileInner(Stream fileStream, string path, string remoteName)
+        {
             var url = string.Format("https://api.cloud.appcelerator.com/v1/files/create.json?key={0}", _appKey);
             var multipart = new MultipartFormDataContent();
 
-            using (var file = File.Open(path, FileMode.Open))
-            {
-                var nameContent = GetNameDataContent("\"name\"", remoteName);
-                multipart.Add(nameContent);
+            var nameContent = GetNameDataContent("\"name\"", remoteName);
+            multipart.Add(nameContent);
 
-                var fileContent = GetFileDataContent(path, file, "text/plain");
-                multipart.Add(fileContent);
+            var fileContent = GetFileDataContent(path, fileStream, "text/plain");
+            multipart.Add(fileContent);
 
-                return await ReadPost<FileResult>(url, multipart).ConfigureAwait(false);
-            }
+            return await ReadPost<FileResult>(url, multipart).ConfigureAwait(false);
         }
 
         private async Task<FileResult> UpdateFileInner(string path, string remoteName, string fileId)
@@ -394,7 +420,7 @@ namespace AppceleratorProxy
             return GetNameDataContent(string.Format("photo_sizes[{0}]", photoSize.Name), photoSize.Size);
         }
 
-        private static StreamContent GetFileDataContent(string path, FileStream file, string mediaType)
+        private static StreamContent GetFileDataContent(string path, Stream file, string mediaType)
         {
             var fileContent = new StreamContent(file);
             fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
