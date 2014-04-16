@@ -33,7 +33,9 @@ namespace WordpressProxy
         {
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", domain, postId);
             var result = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof (Post));
+            var serializer = new DataContractJsonSerializer(typeof (Post),
+                                                            new DataContractJsonSerializerSettings
+                                                                {UseSimpleDictionaryFormat = true});
             return (Post)serializer.ReadObject(result);
         }
 

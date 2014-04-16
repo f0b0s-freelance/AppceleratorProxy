@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace WordpressProxy
 {
@@ -42,14 +44,17 @@ namespace WordpressProxy
         public string Guid { get; set; }
 
         [DataMember(Name = "status")]
-        public string Status { get; set; }
+        private string StatusString { get; set; }
 
-        [DataMember(Name = "parent")]
-        public bool Parent { get; set; }
-
-        [DataMember(Name = "type")]
-        public string Type { get; set; }
-
+        public PostStatus Status
+        {
+            get
+            {
+                PostStatus postStatus;
+                return Enum.TryParse(StatusString, true, out postStatus) ? postStatus : PostStatus.Undefined;
+            }
+        }
+        
         [DataMember(Name = "comments_open")]
         public bool CommentsOpen { get; set; }
 
@@ -63,13 +68,13 @@ namespace WordpressProxy
         public string LikeCount { get; set; }
 
         [DataMember(Name = "i_like")]
-        public string ILike { get; set; }
+        public bool ILike { get; set; }
 
         [DataMember(Name = "is_reblogged")]
-        public string IsReblogged { get; set; }
+        public bool IsReblogged { get; set; }
 
         [DataMember(Name = "is_following")]
-        public string IsFollowing { get; set; }
+        public bool IsFollowing { get; set; }
 
         [DataMember(Name = "global_ID")]
         public string GlobalId { get; set; }
@@ -78,9 +83,24 @@ namespace WordpressProxy
         public string FeaturedImage { get; set; }
 
         [DataMember(Name = "format")]
-        public string Format { get; set; }
+        public string FormatString { get; set; }
+
+        public PostFormat Format
+        {
+            get
+            {
+                PostFormat postFormat;
+                return Enum.TryParse(StatusString, true, out postFormat) ? postFormat : PostFormat.Undefined;
+            }
+        }
 
         [DataMember(Name = "geo")]
         public bool Geo { get; set; }
+
+        [DataMember(Name = "tags")]
+        public Dictionary<string, Item> Tags { get; set; }
+
+        [DataMember(Name = "categories")]
+        public Dictionary<string, Item> Categories { get; set; }
     }
 }

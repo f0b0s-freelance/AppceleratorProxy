@@ -5,6 +5,7 @@ namespace WordpressProxy
         Publish,
         Private,
         Draft,
-        Pending
+        Pending,
+        Undefined
     }
 }

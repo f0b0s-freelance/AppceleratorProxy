@@ -13,7 +13,8 @@ namespace WordpressProxy
         Quote,
         Status,
         Video,
-        Audio
+        Audio,
+        Undefined
     }
 
     public class PostInfo

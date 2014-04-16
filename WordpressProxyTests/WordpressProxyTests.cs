@@ -11,15 +11,14 @@ namespace WordpressProxyTests
         public void CreateTest()
         {
             var proxy = new WordpressProxy.WordpressProxy();
-
         }
 
         [Test]
         public void GetPostByIdTest()
         {
             var proxy = new WordpressProxy.WordpressProxy();
-            var t = proxy.GetPostById("f0bos.wordpress.com", "3");
-            t.Wait();
+            var t = proxy.GetPostById("f0bos.wordpress.com", "5");
+            var post = t.Result;
         }
 
         [Test]

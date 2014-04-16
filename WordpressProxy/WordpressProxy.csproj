@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Author.cs" />
     <Compile Include="AuthResult.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="Meta.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="PostInfo.cs" />
     <Compile Include="PostStatus.cs" />
