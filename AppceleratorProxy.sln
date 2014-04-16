@@ -5,6 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppceleratorProxy", "Accele
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppceleratorProxyTests", "AppceleratorProxyTests\AppceleratorProxyTests.csproj", "{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordpressProxy", "WordpressProxy\WordpressProxy.csproj", "{98F3349C-2DD8-4BC1-8DC0-4B2BFE5C57A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordpressProxyTests", "WordpressProxyTests\WordpressProxyTests.csproj", "{FE6553B0-3368-4E2F-A693-96FED26F2DF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +23,14 @@ Global
 		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2923DBF4-B479-45C4-9BF6-B36CC0E5DE6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F3349C-2DD8-4BC1-8DC0-4B2BFE5C57A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F3349C-2DD8-4BC1-8DC0-4B2BFE5C57A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F3349C-2DD8-4BC1-8DC0-4B2BFE5C57A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F3349C-2DD8-4BC1-8DC0-4B2BFE5C57A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE6553B0-3368-4E2F-A693-96FED26F2DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE6553B0-3368-4E2F-A693-96FED26F2DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE6553B0-3368-4E2F-A693-96FED26F2DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE6553B0-3368-4E2F-A693-96FED26F2DF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
