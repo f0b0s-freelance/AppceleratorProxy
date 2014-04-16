@@ -42,7 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Author.cs" />
+    <Compile Include="AuthResult.cs" />
     <Compile Include="Post.cs" />
+    <Compile Include="PostInfo.cs" />
+    <Compile Include="PostStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WordpressProxy.cs" />
   </ItemGroup>
