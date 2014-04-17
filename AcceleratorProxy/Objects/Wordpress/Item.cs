@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace WordpressProxy
+namespace AppceleratorProxy.Objects.Wordpress
 {
     [DataContract]
     public class Item

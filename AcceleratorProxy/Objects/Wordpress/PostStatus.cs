@@ -1,4 +1,4 @@
-namespace WordpressProxy
+namespace AppceleratorProxy.Objects.Wordpress
 {
     public enum PostStatus
     {

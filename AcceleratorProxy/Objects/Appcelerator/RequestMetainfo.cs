@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace AppceleratorProxy
+namespace AppceleratorProxy.Objects.Appcelerator
 {
     [DataContract]
     public class RequestMetaInfo

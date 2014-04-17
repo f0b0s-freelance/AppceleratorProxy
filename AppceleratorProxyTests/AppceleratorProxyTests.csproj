@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AppceleratorProxyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WordpressProxyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

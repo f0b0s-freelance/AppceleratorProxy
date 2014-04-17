@@ -5,23 +5,22 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
+using AppceleratorProxy.Objects.Appcelerator;
 
-namespace AppceleratorProxy
+namespace AppceleratorProxy.Proxies
 {
-    public class AppceleratorProxy : IDisposable
+    public class AppceleratorProxy : ProxyBase, IDisposable
     {
         private bool _disposed;
         private readonly string _appKey;
-        private readonly HttpClient _httpClient;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="appKey">Application key</param>
-        public AppceleratorProxy(string appKey)
+        public AppceleratorProxy(string appKey) : base()
         {
             _appKey = appKey;
-            _httpClient = new HttpClient();
         }
 
         /// <summary>
@@ -395,26 +394,6 @@ namespace AppceleratorProxy
             }
         }
 
-        private async Task<T> ReadObject<T>(string url, DataContractJsonSerializerSettings settings = null)
-        {
-            var responseTask = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
-            var serializer = settings == null
-                                 ? new DataContractJsonSerializer(typeof (T))
-                                 : new DataContractJsonSerializer(typeof (T), settings);
-            return (T)serializer.ReadObject(responseTask);
-        }
-
-        private async Task<T> ReadPost<T>(string url, HttpContent content, DataContractJsonSerializerSettings settings = null)
-        {
-            var responseMessage = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
-            var responseStream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var serializer = settings == null
-                     ? new DataContractJsonSerializer(typeof(T))
-                     : new DataContractJsonSerializer(typeof(T), settings);
-
-            return (T)serializer.ReadObject(responseStream);
-        }
-
         private static StringContent GetSizeDataContent(PhotoSize photoSize)
         {
             return GetNameDataContent(string.Format("photo_sizes[{0}]", photoSize.Name), photoSize.Size);
@@ -432,17 +411,6 @@ namespace AppceleratorProxy
             return fileContent;
         }
 
-        private static StringContent GetNameDataContent(string name, string value)
-        {
-            var nameContent = new StringContent(value);
-            nameContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                                                         {
-                                                             Name = name
-                                                         };
-            nameContent.Headers.ContentType = null;
-            return nameContent;
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -455,7 +423,7 @@ namespace AppceleratorProxy
             {
                 if (disposing)
                 {
-                    _httpClient.Dispose();
+                    HttpClient.Dispose();
                 }
 
                 _disposed = true;

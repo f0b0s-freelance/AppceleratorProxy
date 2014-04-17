@@ -1,4 +1,4 @@
-namespace AppceleratorProxy
+namespace AppceleratorProxy.Objects.Appcelerator
 {
     public class PhotoSize
     {

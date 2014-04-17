@@ -41,11 +41,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppceleratorProxy.cs" />
-    <Compile Include="PhotoSize.cs" />
+    <Compile Include="Objects\Appcelerator\FileMetaInfo.cs" />
+    <Compile Include="Objects\Appcelerator\FileResponse.cs" />
+    <Compile Include="Objects\Appcelerator\FileResult.cs" />
+    <Compile Include="Objects\Appcelerator\PhotoMetaInfo.cs" />
+    <Compile Include="Objects\Appcelerator\PhotoResponse.cs" />
+    <Compile Include="Objects\Appcelerator\PhotoResult.cs" />
+    <Compile Include="Objects\Appcelerator\PhotoSize.cs" />
+    <Compile Include="Objects\Appcelerator\PhotoUrl.cs" />
+    <Compile Include="Objects\Appcelerator\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestMetainfo.cs" />
-    <Compile Include="RequestResult.cs" />
+    <Compile Include="Proxies\AppceleratorProxy.cs" />
+    <Compile Include="Proxies\ProxyBase.cs" />
+    <Compile Include="Objects\Appcelerator\RequestMetainfo.cs" />
+    <Compile Include="Objects\Appcelerator\RequestResult.cs" />
+    <Compile Include="Objects\Wordpress\Author.cs" />
+    <Compile Include="Objects\Wordpress\AuthResult.cs" />
+    <Compile Include="Objects\Wordpress\Item.cs" />
+    <Compile Include="Objects\Wordpress\Meta.cs" />
+    <Compile Include="Objects\Wordpress\Post.cs" />
+    <Compile Include="Objects\Wordpress\PostInfo.cs" />
+    <Compile Include="Objects\Wordpress\PostStatus.cs" />
+    <Compile Include="Proxies\WordpressProxy.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

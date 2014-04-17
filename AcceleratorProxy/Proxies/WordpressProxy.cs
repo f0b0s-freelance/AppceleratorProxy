@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
+using AppceleratorProxy.Objects.Wordpress;
 
-namespace WordpressProxy
+namespace AppceleratorProxy.Proxies
 {
-    public class WordpressProxy
+    public class WordpressProxy : ProxyBase
     {
         private readonly string _clientId;
         private readonly string _clientSecret;
@@ -16,8 +16,9 @@ namespace WordpressProxy
         private readonly string _code;
         readonly HttpClient _httpClient = new HttpClient();
         private string _token;
+        private bool _disposed;
 
-        public WordpressProxy(string clientId, string clientSecret, string redirectUri, string code)
+        public WordpressProxy(string clientId, string clientSecret, string redirectUri, string code) : base()
         {
             _clientId = clientId;
             _clientSecret = clientSecret;
@@ -25,22 +26,17 @@ namespace WordpressProxy
             _code = code;
         }
         
-        public async Task<Post> GetPostBySlug(string domain, string postSlug)
+        public Task<Post> GetPostBySlug(string domain, string postSlug)
         {
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/slug:{1}", domain, postSlug);
-            var result = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof(Post));
-            return (Post)serializer.ReadObject(result);
+            return ReadObject<Post>(url);
         }
 
-        public async Task<Post> GetPostById(string domain, string postId)
+        public Task<Post> GetPostById(string domain, string postId)
         {
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", domain, postId);
-            var result = await _httpClient.GetStreamAsync(url).ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof (Post),
-                                                            new DataContractJsonSerializerSettings
-                                                                {UseSimpleDictionaryFormat = true});
-            return (Post)serializer.ReadObject(result);
+            var serializerSettings = new DataContractJsonSerializerSettings {UseSimpleDictionaryFormat = true};
+            return ReadObject<Post>(url, serializerSettings);
         }
 
         public async Task<Post> DeletePost(string domain, string postId)
@@ -49,23 +45,19 @@ namespace WordpressProxy
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}/delete", domain, postId);
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
             requestMessage.Headers.Add("authorization", string.Format("Bearer {0}", token));
-            var responseMessage = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
-            var responseStream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof (Post));
-
-            return (Post)serializer.ReadObject(responseStream);
+            return await SendRequest<Post>(requestMessage);
         }
 
-        public async Task<Post> UpdatePost(string domain, PostInfo postInfo, string postId)
+        public Task<Post> UpdatePost(string domain, PostInfo postInfo, string postId)
         {
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", domain, postId);
-            return await UpdatePostInner(postInfo, url);
+            return UpdatePostInner(postInfo, url);
         }
 
-        public async Task<Post> CreatePost(string domain, PostInfo postInfo)
+        public Task<Post> CreatePost(string domain, PostInfo postInfo)
         {
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/new", domain);
-            return await UpdatePostInner(postInfo, url);
+            return UpdatePostInner(postInfo, url);
         }
 
         private async Task<Post> UpdatePostInner(PostInfo postInfo, string url)
@@ -75,14 +67,8 @@ namespace WordpressProxy
             requestMessage.Headers.Add("authorization", string.Format("Bearer {0}", token));
 
             var multipart = GetPostDataContent(postInfo);
-
             requestMessage.Content = multipart;
-
-            var responseMessage = await _httpClient.SendAsync(requestMessage).ConfigureAwait(false);
-            var responseStream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof(Post));
-
-            return (Post)serializer.ReadObject(responseStream);
+            return await SendRequest<Post>(requestMessage);
         }
 
         private static MultipartFormDataContent GetPostDataContent(PostInfo postInfo)
@@ -171,11 +157,7 @@ namespace WordpressProxy
             var grantType = GetNameDataContent("grant_type", "authorization_code");
             multipart.Add(grantType);
 
-            var responseMessage = await _httpClient.PostAsync(url, multipart).ConfigureAwait(false);
-            var responseStream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof (AuthResult));
-
-            var authResult = (AuthResult) serializer.ReadObject(responseStream);
+            var authResult = await ReadPost<AuthResult>(url, multipart);
             if (string.IsNullOrEmpty(authResult.AccessToken))
             {
                 throw new InvalidOperationException("Can't obtain access token");
@@ -184,16 +166,29 @@ namespace WordpressProxy
             _token = authResult.AccessToken;
             return _token;
         }
-
-        private static StringContent GetNameDataContent(string name, string value)
+        
+        public void Dispose()
         {
-            var nameContent = new StringContent(value);
-            nameContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                                                         {
-                                                             Name = name
-                                                         };
-            nameContent.Headers.ContentType = null;
-            return nameContent;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _httpClient.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~WordpressProxy()
+        {
+            Dispose(false);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WordpressProxy
+namespace AppceleratorProxy.Objects.Wordpress
 {
     public enum PostFormat
     {

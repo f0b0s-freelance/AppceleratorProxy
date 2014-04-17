@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Json;
-using AppceleratorProxy;
+using AppceleratorProxy.Objects.Appcelerator;
 using NUnit.Framework;
 
 namespace AppceleratorProxyTests
@@ -14,7 +14,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void AuthorizeTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 var result = proxy.Authorize("admin", "admin");
                 Debug.WriteLine(result.Result.Result.Status);
@@ -24,7 +24,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void CreateFileTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var result = proxy.CreateFile("123.txt", "notes");
@@ -36,7 +36,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void CreateThroughStreamTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             using (var file = File.Open("q.txt", FileMode.Open))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
@@ -50,7 +50,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void DeleteFile()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var result = proxy.DeleteFile("53415768891fdf0b73256cf6");
@@ -62,7 +62,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void GetFile()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var result = proxy.GetFile("5341566c891fdf0b73256bdc");
@@ -73,7 +73,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void UpdateFile()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var result = proxy.UpdateFile("123.txt", "ttt", "534156b315d8270b63256fe4");
@@ -84,7 +84,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void ListFiles()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 //var result = proxy.ListFiles("1", "1", "\"user_id\":\"4f0fe764d9ca72833d000002\", \"name\":\"my_file\"", "created_at");
@@ -96,7 +96,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void CreatePhotoTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
 
@@ -122,7 +122,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void DeletePhotoTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
 
@@ -134,7 +134,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void GetPhotoTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var result = proxy.GetPhoto("53416654ed8cdc0b39003bd3");
@@ -145,7 +145,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void UpdatePhotoTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var sizes = new[]
@@ -166,7 +166,7 @@ namespace AppceleratorProxyTests
         [Test]
         public void ListPhotosTest()
         {
-            using (var proxy = new AppceleratorProxy.AppceleratorProxy(Key))
+            using (var proxy = new AppceleratorProxy.Proxies.AppceleratorProxy(Key))
             {
                 Debug.WriteLine(proxy.Authorize("admin", "admin").Result.Result.Status);
                 var result = proxy.ListPhotos("1", "10", "\"user_id\":\"533efde215d8270b63230641\"", "created_at");
