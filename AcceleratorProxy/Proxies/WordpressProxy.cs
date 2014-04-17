@@ -38,6 +38,11 @@ namespace AppceleratorProxy.Proxies
                 throw new ArgumentException("'clientSecret' can't be empty", "clientSecret");
             }
 
+            if (string.IsNullOrEmpty(redirectUri))
+            {
+                throw new ArgumentException("'redirectUri' can't be empty", "redirectUri");
+            }
+
             if (string.IsNullOrEmpty(code))
             {
                 throw new ArgumentException("'code' can't be empty", "code");
