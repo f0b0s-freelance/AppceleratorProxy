@@ -14,53 +14,134 @@ namespace AppceleratorProxy.Proxies
         private readonly string _clientSecret;
         private readonly string _redirectUri;
         private readonly string _code;
-        readonly HttpClient _httpClient = new HttpClient();
+        private readonly string _domain;
         private string _token;
         private bool _disposed;
 
-        public WordpressProxy(string clientId, string clientSecret, string redirectUri, string code) : base()
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="clientId">Your Application OAuth Client Id</param>
+        /// <param name="clientSecret">Your Application OAuth Client Secret</param>
+        /// <param name="redirectUri">Your Application OAuth Redirect url</param>
+        /// <param name="code">Core retrieved from OAuth authorization on redirect url</param>
+        /// <param name="domain">The site ID, The site domain</param>
+        public WordpressProxy(string clientId, string clientSecret, string redirectUri, string code, string domain) : base()
         {
+            if(string.IsNullOrEmpty(clientId))
+            {
+                throw new ArgumentException("'clientId' can't be empty", "clientId");
+            }
+
+            if (string.IsNullOrEmpty(clientSecret))
+            {
+                throw new ArgumentException("'clientSecret' can't be empty", "clientSecret");
+            }
+
+            if (string.IsNullOrEmpty(code))
+            {
+                throw new ArgumentException("'code' can't be empty", "code");
+            }
+
+            if (string.IsNullOrEmpty(domain))
+            {
+                throw new ArgumentException("'domain' can't be empty", "domain");
+            }
+
             _clientId = clientId;
             _clientSecret = clientSecret;
             _redirectUri = redirectUri;
             _code = code;
+            _domain = domain;
         }
-        
-        public Task<Post> GetPostBySlug(string domain, string postSlug)
+
+        /// <summary>
+        /// Return a single Post (by slug)
+        /// </summary>
+        /// <param name="postSlug">The post slug (a.k.a. sanitized name)</param>
+        /// <returns>Post object</returns>
+        public Task<Post> GetPostBySlug(string postSlug)
         {
-            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/slug:{1}", domain, postSlug);
+            if (string.IsNullOrEmpty(postSlug))
+            {
+                throw new ArgumentException("'postSlug' can't be empty", "postSlug");
+            }
+
+            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/slug:{1}", _domain, postSlug);
             return ReadObject<Post>(url);
         }
 
-        public Task<Post> GetPostById(string domain, string postId)
+        /// <summary>
+        /// Return a single Post (by ID)
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <returns>Post object</returns>
+        public Task<Post> GetPostById(string postId)
         {
-            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", domain, postId);
+            if (string.IsNullOrEmpty(postId))
+            {
+                throw new ArgumentException("'postId' can't be empty", "postId");
+            }
+
+            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", _domain, postId);
             var serializerSettings = new DataContractJsonSerializerSettings {UseSimpleDictionaryFormat = true};
             return ReadObject<Post>(url, serializerSettings);
         }
 
-        public async Task<Post> DeletePost(string domain, string postId)
+        /// <summary>
+        /// Delete a Post
+        /// </summary>
+        /// <param name="postId">The post ID</param>
+        /// <returns>Deleted Post object</returns>
+        public Task<Post> DeletePost(string postId)
         {
-            var token = await GetToken();
-            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}/delete", domain, postId);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
-            requestMessage.Headers.Add("authorization", string.Format("Bearer {0}", token));
-            return await SendRequest<Post>(requestMessage);
+            if (string.IsNullOrEmpty(postId))
+            {
+                throw new ArgumentException("'postId' can't be empty", "postId");
+            }
+
+            return DeletePostInner(postId);
         }
 
-        public Task<Post> UpdatePost(string domain, PostInfo postInfo, string postId)
+        /// <summary>
+        /// Edit a Post
+        /// </summary>
+        /// <param name="postInfo">PostInfo object</param>
+        /// <param name="postId">The post ID</param>
+        /// <returns>Updated Post object</returns>
+        public Task<Post> EditPost(PostInfo postInfo, string postId)
         {
-            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", domain, postId);
-            return UpdatePostInner(postInfo, url);
+            if (postInfo == null)
+            {
+                throw new ArgumentNullException("postInfo");
+            }
+
+            if (string.IsNullOrEmpty(postId))
+            {
+                throw new ArgumentException("'postId' can't be empty", "postId");
+            }
+
+            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}", _domain, postId);
+            return EditPostInner(postInfo, url);
         }
 
-        public Task<Post> CreatePost(string domain, PostInfo postInfo)
+        /// <summary>
+        /// Create a Post
+        /// </summary>
+        /// <param name="postInfo">PostInfo object</param>
+        /// <returns>Created Post object</returns>
+        public Task<Post> CreatePost(PostInfo postInfo)
         {
-            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/new", domain);
-            return UpdatePostInner(postInfo, url);
+            if (postInfo == null)
+            {
+                throw new ArgumentNullException("postInfo");
+            }
+
+            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/new", _domain);
+            return EditPostInner(postInfo, url);
         }
 
-        private async Task<Post> UpdatePostInner(PostInfo postInfo, string url)
+        private async Task<Post> EditPostInner(PostInfo postInfo, string url)
         {
             var token = await GetToken();
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
@@ -68,6 +149,15 @@ namespace AppceleratorProxy.Proxies
 
             var multipart = GetPostDataContent(postInfo);
             requestMessage.Content = multipart;
+            return await SendRequest<Post>(requestMessage);
+        }
+
+        private async Task<Post> DeletePostInner(string postId)
+        {
+            var token = await GetToken();
+            var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}/delete", _domain, postId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+            requestMessage.Headers.Add("authorization", string.Format("Bearer {0}", token));
             return await SendRequest<Post>(requestMessage);
         }
 
@@ -179,7 +269,7 @@ namespace AppceleratorProxy.Proxies
             {
                 if (disposing)
                 {
-                    _httpClient.Dispose();
+                    HttpClient.Dispose();
                 }
 
                 _disposed = true;

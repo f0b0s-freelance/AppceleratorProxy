@@ -19,27 +19,28 @@ namespace AppceleratorProxyTests
             const string clientSecret = "REryTBb536tsDFZryLsLE8WinmStTNQShP6B2W8yGXnqMgJZxVA5fTAZB8EEJuVU";
             const string redirectUri = "http://skyfer.com";
             const string code = "1ZI4mDc7mJ";
-            _proxy = new WordpressProxy(clientId, clientSecret, redirectUri, code);
+            const string domain = "f0bos.wordpress.com";
+            _proxy = new WordpressProxy(clientId, clientSecret, redirectUri, code, domain);
         }
         
         [Test]
         public void GetPostByIdTest()
         {
-            var t = _proxy.GetPostById("f0bos.wordpress.com", "5");
+            var t = _proxy.GetPostById("5");
             var post = t.Result;
         }
 
         [Test]
         public void GetPostBySlugTest()
         {
-            var t = _proxy.GetPostBySlug("f0bos.wordpress.com", "title-for-my-first-post");
+            var t = _proxy.GetPostBySlug("title-for-my-first-post");
             var post = t.Result;
         }
 
         [Test]
         public void DeletePostTest()
         {
-            var t = _proxy.DeletePost("f0bos.wordpress.com", "35");
+            var t = _proxy.DeletePost("35");
             var deleted = t.Result;
         }
 
@@ -64,7 +65,7 @@ namespace AppceleratorProxyTests
                                    CommentsOpen = false,
                                    PingsOpen = false
                                };
-            var t = _proxy.CreatePost("f0bos.wordpress.com", postInfo);
+            var t = _proxy.CreatePost(postInfo);
             var deleted = t.Result;
         }
 
@@ -91,7 +92,7 @@ namespace AppceleratorProxyTests
                                    CommentsOpen = true,
                                    PingsOpen = true
                                };
-            var t = _proxy.UpdatePost("f0bos.wordpress.com", postInfo, "30");
+            var t = _proxy.EditPost(postInfo, "30");
             var deleted = t.Result;
         }
 
@@ -116,12 +117,12 @@ namespace AppceleratorProxyTests
                                    CommentsOpen = false,
                                    PingsOpen = false
                                };
-            var createdInfoTask = _proxy.CreatePost("f0bos.wordpress.com", postInfo);
+            var createdInfoTask = _proxy.CreatePost(postInfo);
             Console.WriteLine(createdInfoTask.Result.Id);
             var createdId = createdInfoTask.Result.Id;
 
             postInfo.Title += " updated";
-            var updatedInfoTask = _proxy.UpdatePost("f0bos.wordpress.com", postInfo, createdId);
+            var updatedInfoTask = _proxy.EditPost(postInfo, createdId);
             Console.WriteLine(updatedInfoTask.Result.Id);
         }
     }
