@@ -10,17 +10,21 @@ namespace WordpressProxy
 {
     public class WordpressProxy
     {
+        private readonly string _clientId;
+        private readonly string _clientSecret;
+        private readonly string _redirectUri;
+        private readonly string _code;
         readonly HttpClient _httpClient = new HttpClient();
+        private string _token;
 
-        public async Task Create(string title, string content, string tags, string categories)
+        public WordpressProxy(string clientId, string clientSecret, string redirectUri, string code)
         {
-            var multipart = new MultipartFormDataContent();
-
-            var result = await _httpClient.PostAsync("https://public-api.wordpress.com/rest/v1/sites/30434183/posts/new/",
-                                               multipart).ConfigureAwait(false);
-            Console.WriteLine(result.Content.ReadAsStringAsync().Result);
+            _clientId = clientId;
+            _clientSecret = clientSecret;
+            _redirectUri = redirectUri;
+            _code = code;
         }
-
+        
         public async Task<Post> GetPostBySlug(string domain, string postSlug)
         {
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/slug:{1}", domain, postSlug);
@@ -39,10 +43,9 @@ namespace WordpressProxy
             return (Post)serializer.ReadObject(result);
         }
 
-        public async Task<Post> DeletePost(string domain, string postId, string authKey)
+        public async Task<Post> DeletePost(string domain, string postId)
         {
-            const string token = "X1LL&Lan8M#L@Fhzr77%ZW&8U2yfTBPq4Qa&ObMzdD)#OlGSjpllolevZn(@JI7%"; //GetToken();
-
+            var token = await GetToken();
             var url = string.Format("https://public-api.wordpress.com/rest/v1/sites/{0}/posts/{1}/delete", domain, postId);
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
             requestMessage.Headers.Add("authorization", string.Format("Bearer {0}", token));
@@ -67,7 +70,7 @@ namespace WordpressProxy
 
         private async Task<Post> UpdatePostInner(PostInfo postInfo, string url)
         {
-            const string token = "X1LL&Lan8M#L@Fhzr77%ZW&8U2yfTBPq4Qa&ObMzdD)#OlGSjpllolevZn(@JI7%"; //GetToken();
+            var token = await GetToken();
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
             requestMessage.Headers.Add("authorization", string.Format("Bearer {0}", token));
 
@@ -143,21 +146,26 @@ namespace WordpressProxy
             return itemsString.ToString();
         }
 
-        private async Task<AuthResult> GetToken()
+        private async Task<string> GetToken()
         {
+            if (!string.IsNullOrEmpty(_token))
+            {
+                return _token;
+            }
+
             const string url = "https://public-api.wordpress.com/oauth2/token";
             var multipart = new MultipartFormDataContent();
 
-            var clientId = GetNameDataContent("client_id", "34711");
+            var clientId = GetNameDataContent("client_id", _clientId);
             multipart.Add(clientId);
 
-            var clientSecret = GetNameDataContent("client_secret", "REryTBb536tsDFZryLsLE8WinmStTNQShP6B2W8yGXnqMgJZxVA5fTAZB8EEJuVU");
+            var clientSecret = GetNameDataContent("client_secret", _clientSecret);
             multipart.Add(clientSecret);
 
-            var code = GetNameDataContent("code", "W5k2NX1wVv");
+            var code = GetNameDataContent("code", _code);
             multipart.Add(code);
 
-            var redirectUri = GetNameDataContent("redirect_uri", "http://skyfer.com");
+            var redirectUri = GetNameDataContent("redirect_uri", _redirectUri);
             multipart.Add(redirectUri);
 
             var grantType = GetNameDataContent("grant_type", "authorization_code");
@@ -165,9 +173,16 @@ namespace WordpressProxy
 
             var responseMessage = await _httpClient.PostAsync(url, multipart).ConfigureAwait(false);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var serializer = new DataContractJsonSerializer(typeof(AuthResult));
+            var serializer = new DataContractJsonSerializer(typeof (AuthResult));
 
-            return (AuthResult)serializer.ReadObject(responseStream);
+            var authResult = (AuthResult) serializer.ReadObject(responseStream);
+            if (string.IsNullOrEmpty(authResult.AccessToken))
+            {
+                throw new InvalidOperationException("Can't obtain access token");
+            }
+
+            _token = authResult.AccessToken;
+            return _token;
         }
 
         private static StringContent GetNameDataContent(string name, string value)
@@ -180,6 +195,5 @@ namespace WordpressProxy
             nameContent.Headers.ContentType = null;
             return nameContent;
         }
-
     }
 }
