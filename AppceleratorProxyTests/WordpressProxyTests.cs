@@ -18,7 +18,7 @@ namespace AppceleratorProxyTests
             const string clientId = "34711";
             const string clientSecret = "REryTBb536tsDFZryLsLE8WinmStTNQShP6B2W8yGXnqMgJZxVA5fTAZB8EEJuVU";
             const string redirectUri = "http://skyfer.com";
-            const string code = "acGIdFOAAM";
+            const string code = "xywUn4ALhN";
             const string domain = "f0bos.wordpress.com";
             _proxy = new WordpressProxy(clientId, clientSecret, redirectUri, code, domain);
         }
@@ -26,8 +26,9 @@ namespace AppceleratorProxyTests
         [Test]
         public void GetPostByIdTest()
         {
-            var t = _proxy.GetPostById("5");
+            var t = _proxy.GetPostById("48");
             var post = t.Result;
+            Console.WriteLine(post.Title);
         }
 
         [Test]
@@ -92,7 +93,7 @@ namespace AppceleratorProxyTests
                                    CommentsOpen = true,
                                    PingsOpen = true
                                };
-            var t = _proxy.EditPost(postInfo, "30");
+            var t = _proxy.EditPost(postInfo, "48");
             var deleted = t.Result;
         }
 

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
+using AppceleratorProxy.Infrastructure;
 using AppceleratorProxy.Objects.Wordpress;
 
 namespace AppceleratorProxy.Proxies
@@ -15,6 +16,7 @@ namespace AppceleratorProxy.Proxies
         private readonly string _redirectUri;
         private readonly string _code;
         private readonly string _domain;
+        private IsolatedStorageRepository<string> isolatedStorageRepository = new IsolatedStorageRepository<string>();  
         private string _token;
         private bool _disposed;
 
@@ -234,6 +236,13 @@ namespace AppceleratorProxy.Proxies
                 return _token;
             }
 
+            if (isolatedStorageRepository.Exists(_code))
+            {
+                var key = isolatedStorageRepository.Read(_code);
+                _token = key;
+                return _token;
+            }
+
             const string url = "https://public-api.wordpress.com/oauth2/token";
             var multipart = new MultipartFormDataContent();
 
@@ -259,6 +268,8 @@ namespace AppceleratorProxy.Proxies
             }
 
             _token = authResult.AccessToken;
+            isolatedStorageRepository.Write(_code, _token);
+
             return _token;
         }
         
