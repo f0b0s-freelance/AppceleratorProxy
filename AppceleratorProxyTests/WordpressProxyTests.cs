@@ -18,7 +18,7 @@ namespace AppceleratorProxyTests
             const string clientId = "34711";
             const string clientSecret = "REryTBb536tsDFZryLsLE8WinmStTNQShP6B2W8yGXnqMgJZxVA5fTAZB8EEJuVU";
             const string redirectUri = "http://skyfer.com";
-            const string code = "xywUn4ALhN";
+            const string code = "gxE3rbYXnU";
             const string domain = "f0bos.wordpress.com";
             _proxy = new WordpressProxy(clientId, clientSecret, redirectUri, code, domain);
         }
